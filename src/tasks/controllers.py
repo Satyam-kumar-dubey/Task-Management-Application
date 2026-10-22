@@ -15,12 +15,15 @@ def create_task(body: TaskSchema, db: Session ):
     db.refresh(new_task)
     
     
-    return {"Status": "Task Created Successfully","data": new_task }
+    return new_task
+
+
 
 def get_all_products(db : Session):
     data = db.query(TaskModel).all()
     
-    return {"Status": "Success","data": data }
+    return data
+
 
 
 def get_one_task(task_id : int, db = Session):
@@ -29,4 +32,35 @@ def get_one_task(task_id : int, db = Session):
     if not one_task:
         raise HTTPException(404, detail="Task Id is Incorrect")
     
-    return {"Status": "Success","data": one_task}
+    return one_task
+
+
+
+def update_task(body: TaskModel, task_id: int, db : Session):
+    one_task = db.query(TaskModel).get(task_id)
+    
+    if not one_task:
+        raise HTTPException(404, detail="Task Id does not Exists..")
+    
+    body = body.model_dump()
+    for field, value in body.items():
+        setattr(one_task,field,value)
+    
+    
+    db.add(one_task)
+    db.commit()
+    db.refresh(one_task)
+    
+    return one_task
+
+
+def delete_task(task_id: int, db: Session):
+    one_task = db.query(TaskModel).get(task_id)
+    
+    if not one_task:
+        raise HTTPException(404, detail="Task Id does not Exists..")
+    
+    db.delete(one_task)
+    db.commit()
+    
+    return None
