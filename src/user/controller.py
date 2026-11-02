@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from src.user.models import UserModel
 from pwdlib import PasswordHash
 import jwt
-from jwt import InvalidTokenError
+from jwt.exceptions import InvalidTokenError
 from src.utils.settings import setting
 
 password_hash = PasswordHash.recommended()
@@ -55,7 +55,7 @@ def login(body : loginSchema, db : Session):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="You have Entered Wrong Password!")
     
     
-    exp_time = datetime.now() + timedelta(seconds=20)
+    exp_time = datetime.now() + timedelta(minutes=setting.ACCESS_TOKEN_EXPIRE_MINUTES)
     token = jwt.encode({"_id":user.id, "exp": exp_time.timestamp()},setting.SECRET_KEY,setting.ALGORITHM)
     
     return {"token": token}
