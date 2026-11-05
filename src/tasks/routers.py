@@ -16,7 +16,7 @@ def create_task(body: TaskSchema, db: Session = Depends(get_db), user:UserModel 
 
 @task_routes.get("/all_tasks", response_model=List[TaskResponseSchema], status_code=status.HTTP_200_OK)
 def get_all_tasks(db : Session = Depends(get_db), user:UserModel = Depends(is_authenticated)):
-    return controllers.get_all_products(db)
+    return controllers.get_all_products(db, user)
 
 @task_routes.get("/one_task/{task_id}", response_model=TaskResponseSchema, status_code=status.HTTP_200_OK)
 def get_one_task(task_id : int, db : Session = Depends(get_db), user:UserModel = Depends(is_authenticated)):
@@ -25,7 +25,7 @@ def get_one_task(task_id : int, db : Session = Depends(get_db), user:UserModel =
 
 @task_routes.put("/update_task/{task_id}" , response_model=TaskResponseSchema, status_code=status.HTTP_201_CREATED)
 def update_task(body: TaskSchema, task_id: int, db : Session = Depends(get_db), user:UserModel = Depends(is_authenticated)):
-    return controllers.update_task(body,task_id,db)
+    return controllers.update_task(body,task_id,db, user)
 
 
 @task_routes.delete("/delete_task/{task_id}", response_model=None, status_code=status.HTTP_204_NO_CONTENT)

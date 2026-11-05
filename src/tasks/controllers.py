@@ -22,8 +22,8 @@ def create_task(body: TaskSchema, db: Session, user: UserModel):
 
 
 
-def get_all_products(db : Session):
-    data = db.query(TaskModel).all()
+def get_all_products(db : Session, user: UserModel):
+    data = db.query(TaskModel).filter(TaskModel.user_id == user.id).all()
     
     return data
 
@@ -39,11 +39,14 @@ def get_one_task(task_id : int, db = Session):
 
 
 
-def update_task(body: TaskModel, task_id: int, db : Session):
+def update_task(body: TaskModel, task_id: int, db : Session, user:UserModel):
     one_task = db.query(TaskModel).get(task_id)
     
     if not one_task:
         raise HTTPException(404, detail="Task Id does not Exists..")
+    
+    if one_task.user_id != user.id:
+        raise HTTPException(401, detail="You are not allowed to update this task.")
     
     body = body.model_dump()
     for field, value in body.items():
