@@ -7,6 +7,7 @@ from pwdlib import PasswordHash
 import jwt
 from jwt.exceptions import InvalidTokenError
 from src.utils.settings import setting
+from src.utils.mail import send_email
 
 password_hash = PasswordHash.recommended()
 
@@ -16,7 +17,7 @@ def get_password_hash(password):
 def verify_password(plain_password, hashed_password):
     return password_hash.verify(plain_password, hashed_password)
 
-def register(body: UserSchema, db: Session):
+async def register(body: UserSchema, db: Session):
     
     is_user = db.query(UserModel).filter(UserModel.username == body.username).first()
     
@@ -40,6 +41,10 @@ def register(body: UserSchema, db: Session):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+    
+    ##sending the confirmation email 
+    
+    res = await send_email([new_user.email])
     
     return new_user
 
